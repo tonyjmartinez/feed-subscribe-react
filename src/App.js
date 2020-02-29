@@ -26,33 +26,26 @@ const logout = () => {
   localStorage.removeItem("profile");
 };
 
+const checkAuth = () => {
+  lock.checkSession({ scope: "read:order write:order" }, function(
+    error,
+    authResult
+  ) {
+    if (error || !authResult) {
+      console.log("error checking auth", error);
+      lock.show();
+    } else {
+      // user has an active session, so we can use the accessToken directly.
+      lock.getUserInfo(authResult.accessToken, function(error, profile) {
+        console.log(error, profile);
+        console.log("authResult", authResult);
+      });
+    }
+  });
+};
+
 function App() {
   useEffect(() => {
-    // lock.checkSession({}, function(error, authResult) {
-    //   if (error || !authResult) {
-    //     console.log("error", error);
-    //     lock.show();
-    //   } else {
-    //     console.log("not error");
-    //     // user has an active session, so we can use the accessToken directly.
-    //     lock.getUserInfo(authResult.accessToken, function(
-    //       error,
-    //       profileResult
-    //     ) {
-    //       let accessToken = null;
-    //       let profile = null;
-    //       console.log(error, profile);
-    //       accessToken = authResult.accessToken;
-    //       profile = profileResult;
-    //       console.log("accesstoken", accessToken);
-    //       console.log("id token", authResult.idToken);
-    //       localStorage.setItem("accessToken", authResult.accessToken);
-    //       localStorage.setItem("id_token", authResult.idToken);
-    //       localStorage.setItem("profile", JSON.stringify(profile));
-    //     });
-    //   }
-    // });
-
     lock.on("authenticated", function(authResult) {
       lock.getUserInfo(authResult.accessToken, function(error, profileResult) {
         console.log(authResult);
@@ -107,6 +100,7 @@ function App() {
       <button onClick={() => lock.show()}>Login</button>
       <button onClick={() => fetchPrivate()}>Fetch</button>
       <button onClick={() => logout()}>Logout</button>
+      <button onClick={() => checkAuth()}>Check Auth</button>
     </div>
   );
 }
