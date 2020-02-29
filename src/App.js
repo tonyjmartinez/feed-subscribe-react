@@ -32,6 +32,8 @@ function handleAuthentication() {
   webAuth.parseHash(function(err, authResult) {
     if (authResult && authResult.accessToken && authResult.idToken) {
       console.log("auth", authResult);
+      localStorage.setItem("accessToken", authResult.accessToken);
+      localStorage.setItem("id_token", authResult.idToken);
     } else if (err) {
       console.log(err);
       alert("Error: " + err.error + ". Check the console for further details.");
