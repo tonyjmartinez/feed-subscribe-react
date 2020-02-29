@@ -5,10 +5,11 @@ import { Auth0Lock } from "auth0-lock";
 
 const clientId = process.env.REACT_APP_CLIENT_ID;
 console.log("clientId", clientId);
-const domain = process.env.REACT_APP_AUTH0_DOMAIN;
+console.log(localStorage.getItem("id_token"));
+// const domain = process.env.REACT_APP_AUTH0_DOMAIN;
+const domain = "tonyjmartinez.auth0.com";
 const lock = new Auth0Lock(clientId, domain, {
   // eslint-disable-line no-undef
-
   auth: {
     params: {
       scope: "openid email"
@@ -27,46 +28,45 @@ const logout = () => {
 
 function App() {
   useEffect(() => {
-    lock.checkSession({}, function(error, authResult) {
-      if (error || !authResult) {
-        console.log("error", error);
-        lock.show();
-      } else {
-        // user has an active session, so we can use the accessToken directly.
-        lock.getUserInfo(authResult.accessToken, function(
-          error,
-          profileResult
-        ) {
-          let accessToken = null;
-          let profile = null;
-          console.log(error, profile);
-          accessToken = authResult.accessToken;
-          profile = profileResult;
-          console.log("accesstoken", accessToken);
-          console.log("id token", authResult.idToken);
+    // lock.checkSession({}, function(error, authResult) {
+    //   if (error || !authResult) {
+    //     console.log("error", error);
+    //     lock.show();
+    //   } else {
+    //     console.log("not error");
+    //     // user has an active session, so we can use the accessToken directly.
+    //     lock.getUserInfo(authResult.accessToken, function(
+    //       error,
+    //       profileResult
+    //     ) {
+    //       let accessToken = null;
+    //       let profile = null;
+    //       console.log(error, profile);
+    //       accessToken = authResult.accessToken;
+    //       profile = profileResult;
+    //       console.log("accesstoken", accessToken);
+    //       console.log("id token", authResult.idToken);
+    //       localStorage.setItem("accessToken", authResult.accessToken);
+    //       localStorage.setItem("id_token", authResult.idToken);
+    //       localStorage.setItem("profile", JSON.stringify(profile));
+    //     });
+    //   }
+    // });
+
+    lock.on("authenticated", function(authResult) {
+      lock.getUserInfo(authResult.accessToken, function(error, profileResult) {
+        console.log(authResult);
+        lock.getUserInfo(authResult.accessToken, (error, profile) => {
+          if (error) {
+            // Handle error
+            console.log("error loggin in");
+            return;
+          }
+
           localStorage.setItem("accessToken", authResult.accessToken);
           localStorage.setItem("id_token", authResult.idToken);
           localStorage.setItem("profile", JSON.stringify(profile));
         });
-      }
-    });
-
-    lock.on("authenticated", function(authResult) {
-      lock.getUserInfo(authResult.accessToken, function(error, profileResult) {
-        let accessToken = null;
-        let profile = null;
-        if (error) {
-          console.log(error);
-          return;
-        }
-
-        accessToken = authResult.accessToken;
-        profile = profileResult;
-        console.log("accesstoken", accessToken);
-        console.log("id token", authResult.idToken);
-        localStorage.setItem("accessToken", authResult.accessToken);
-        localStorage.setItem("id_token", authResult.idToken);
-        localStorage.setItem("profile", JSON.stringify(profile));
       });
     });
   }, []);
