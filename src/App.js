@@ -30,7 +30,6 @@ function App() {
     lock.checkSession({}, function(error, authResult) {
       if (error || !authResult) {
         console.log("error", error);
-        console.log(authResult);
         lock.show();
       } else {
         // user has an active session, so we can use the accessToken directly.
