@@ -56,7 +56,6 @@ function App() {
         let accessToken = null;
         let profile = null;
         if (error) {
-          // Handle error
           console.log(error);
           return;
         }
@@ -68,8 +67,6 @@ function App() {
         localStorage.setItem("accessToken", authResult.accessToken);
         localStorage.setItem("id_token", authResult.idToken);
         localStorage.setItem("profile", JSON.stringify(profile));
-
-        // Update DOM
       });
     });
   }, []);
@@ -96,7 +93,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          Edit your <code>src/App.js</code> and save to reload.
         </p>
         <a
           className="App-link"
