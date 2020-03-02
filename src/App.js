@@ -1,48 +1,26 @@
 import React, { useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import auth0 from "auth0-js";
-const { setSession } = auth0;
-const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-console.log("is dev?", isDev);
 
-console.log(localStorage.getItem("id_token"));
-// const domain = process.env.REACT_APP_AUTH0_DOMAIN;
-const ID_TOKEN = "id_token";
-const ACCESS_TOKEN = "access_token";
-const EXPIRES_IN = "expires_in";
-
-const webAuth = new auth0.WebAuth({
-  domain: "tonyjmartinez.auth0.com",
-  clientID: process.env.REACT_APP_CLIENT_ID,
-  responseType: "token id_token",
-  audience: "https://tonyjmartinez.auth0.com/userinfo",
-  scope: "openid email",
-  // redirectUri: isDev ? "http://localhost:3000" : "https://www.feedsubscri.be/"
-  redirectUri: window.location.origin
-});
+import {
+  handleAuthentication,
+  checkAuth,
+  login,
+  logout,
+  EXPIRES_IN,
+  ID_TOKEN,
+  ACCESS_TOKEN
+} from "./utils/auth0-helper";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useHistory
+} from "react-router-dom";
+import { createBrowserHistory } from "history";
 const PRIVATE_ENDPOINT =
   "https://h9gqunf6y7.execute-api.us-west-2.amazonaws.com/dev/api/private";
-
-const logout = () => {
-  localStorage.removeItem("id_token");
-  localStorage.removeItem("access_token");
-};
-
-function handleAuthentication() {
-  webAuth.parseHash(function(err, authResult) {
-    if (authResult && authResult.accessToken && authResult.idToken) {
-      console.log("auth", authResult);
-      localStorage.setItem(ACCESS_TOKEN, authResult.accessToken);
-      localStorage.setItem(ID_TOKEN, authResult.idToken);
-      localStorage.setItem(EXPIRES_IN, authResult.expiresIn);
-      // TODO: Redirect to webroot
-    } else if (err) {
-      console.log(err);
-      alert("Error: " + err.error + ". Check the console for further details.");
-    }
-  });
-}
 
 // const checkAuth = () => {
 //   lock.checkSession({ scope: "read:order write:order" }, function(
@@ -61,21 +39,18 @@ function handleAuthentication() {
 //     }
 //   });
 // };
-const checkAuth = () => {
-  webAuth.checkSession({}, function(err, authResult) {
-    // err if automatic parseHash fails
-    console.log("errror", err);
-    console.log("authResult", authResult);
-  });
-};
 
-function App() {
+const App = props => {
   useEffect(() => {
     // webAuth.authorize();
     console.log("expires in ? ", localStorage.getItem(EXPIRES_IN));
 
-    handleAuthentication();
+    handleAuthentication(() => history.push("/"));
   }, []);
+
+  useEffect(() => {
+    checkAuth(() => history.push("/"));
+  });
 
   const fetchPrivate = () => {
     const token = localStorage.getItem(ID_TOKEN);
@@ -94,29 +69,20 @@ function App() {
         console.log("error", e);
       });
   };
+  const history = createBrowserHistory();
+  console.log("props", props);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit your <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <button onClick={() => webAuth.authorize()}>Login</button>
-      <button onClick={() => fetchPrivate()}>Fetch</button>
-      <button onClick={() => logout()}>Logout</button>
-      <button onClick={() => checkAuth()}>Check</button>
-      {/* <button onClick={() => checkAuth()}>Check Auth</button> */}
-    </div>
+    <Router>
+      <Route path="/">
+        <button onClick={() => login(() => history.push("/"))}>Login</button>
+        <button onClick={() => fetchPrivate()}>Fetch</button>
+        <button onClick={() => logout()}>Logout</button>
+        <button onClick={() => checkAuth(res => console.log("res", res))}>
+          Check
+        </button>
+      </Route>
+    </Router>
   );
-}
+};
 
 export default App;
