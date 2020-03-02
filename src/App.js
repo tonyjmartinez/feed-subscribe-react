@@ -1,6 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import Navbar from "./components/Navbar";
+import "primereact/resources/themes/luna-pink/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
 
 import {
   handleAuthentication,
@@ -41,15 +45,24 @@ const PRIVATE_ENDPOINT =
 // };
 
 const App = props => {
+  const [isAuth, setIsAuth] = useState(false);
   useEffect(() => {
     // webAuth.authorize();
     console.log("expires in ? ", localStorage.getItem(EXPIRES_IN));
 
-    handleAuthentication(() => history.push("/"));
+    handleAuthentication();
   }, []);
 
   useEffect(() => {
-    checkAuth(() => history.push("/"));
+    checkAuth(status => {
+      console.log("status", status);
+      if (!status) setIsAuth(false);
+      else {
+        setIsAuth(true);
+      }
+
+      history.push("/");
+    });
   });
 
   const fetchPrivate = () => {
@@ -73,6 +86,7 @@ const App = props => {
   console.log("props", props);
   return (
     <Router>
+      <Navbar />
       <Route path="/">
         <button onClick={() => login(() => history.push("/"))}>Login</button>
         <button onClick={() => fetchPrivate()}>Fetch</button>
@@ -80,6 +94,7 @@ const App = props => {
         <button onClick={() => checkAuth(res => console.log("res", res))}>
           Check
         </button>
+        <div>{!isAuth ? "Not authenticated" : "Authenticated"}</div>
       </Route>
     </Router>
   );

@@ -7,10 +7,11 @@ console.log(localStorage.getItem("id_token"));
 export const ID_TOKEN = "id_token";
 export const ACCESS_TOKEN = "access_token";
 export const EXPIRES_IN = "expires_in";
+const clientID = process.env.REACT_APP_CLIENT_ID;
 
 const webAuth = new auth0.WebAuth({
   domain: "tonyjmartinez.auth0.com",
-  clientID: process.env.REACT_APP_CLIENT_ID,
+  clientID,
   responseType: "token id_token",
   audience: "https://tonyjmartinez.auth0.com/userinfo",
   scope: "openid email",
@@ -25,6 +26,10 @@ export const login = cb => {
 export const logout = () => {
   localStorage.removeItem("id_token");
   localStorage.removeItem("access_token");
+  webAuth.logout({
+    returnTo: window.location.origin,
+    clientID
+  });
 };
 
 export function handleAuthentication(cb) {
