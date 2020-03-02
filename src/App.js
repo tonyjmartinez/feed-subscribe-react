@@ -3,20 +3,21 @@ import logo from "./logo.svg";
 import "./App.css";
 import auth0 from "auth0-js";
 const { setSession } = auth0;
+const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
-const clientId = process.env.REACT_APP_CLIENT_ID;
-console.log("clientId", clientId);
 console.log(localStorage.getItem("id_token"));
 // const domain = process.env.REACT_APP_AUTH0_DOMAIN;
-const domain = "tonyjmartinez.auth0.com";
+const ID_TOKEN = "id_token";
+const ACCESS_TOKEN = "access_token";
+const EXPIRES_IN = "expires_in";
 
 const webAuth = new auth0.WebAuth({
   domain: "tonyjmartinez.auth0.com",
-  clientID: "zzdHk5KatE3q2qHzl7y7N7XsfwHKhrTR",
+  clientID: process.env.REACT_APP_CLIENT_ID,
   responseType: "token id_token",
   audience: "https://tonyjmartinez.auth0.com/userinfo",
   scope: "openid email",
-  redirectUri: "https://feedsubscri.be"
+  redirectUri: isDev ? "http://localhost:3000" : "https://feedsubscri.be"
   // redirectUri: "http://localhost:3000/"
 });
 const PRIVATE_ENDPOINT =
@@ -25,21 +26,23 @@ const PRIVATE_ENDPOINT =
 const logout = () => {
   localStorage.removeItem("id_token");
   localStorage.removeItem("access_token");
-  localStorage.removeItem("profile");
 };
 
 function handleAuthentication() {
   webAuth.parseHash(function(err, authResult) {
     if (authResult && authResult.accessToken && authResult.idToken) {
       console.log("auth", authResult);
-      localStorage.setItem("accessToken", authResult.accessToken);
-      localStorage.setItem("id_token", authResult.idToken);
+      localStorage.setItem(ACCESS_TOKEN, authResult.accessToken);
+      localStorage.setItem(ID_TOKEN, authResult.idToken);
+      localStorage.setItem(EXPIRES_IN, authResult.expiresIn);
+      // TODO: Redirect to webroot
     } else if (err) {
       console.log(err);
       alert("Error: " + err.error + ". Check the console for further details.");
     }
   });
 }
+
 // const checkAuth = () => {
 //   lock.checkSession({ scope: "read:order write:order" }, function(
 //     error,
@@ -57,30 +60,24 @@ function handleAuthentication() {
 //     }
 //   });
 // };
+const checkAuth = () => {
+  webAuth.checkSession({}, function(err, authResult) {
+    // err if automatic parseHash fails
+    console.log("errror", err);
+    console.log("authResult", authResult);
+  });
+};
 
 function App() {
   useEffect(() => {
-    // lock.on("authenticated", function(authResult) {
-    //   lock.getUserInfo(authResult.accessToken, function(error, profileResult) {
-    //     console.log(authResult);
-    //     lock.getUserInfo(authResult.accessToken, (error, profile) => {
-    //       if (error) {
-    //         // Handle error
-    //         console.log("error loggin in");
-    //         return;
-    //       }
+    // webAuth.authorize();
+    console.log("expires in ? ", localStorage.getItem(EXPIRES_IN));
 
-    //       localStorage.setItem("accessToken", authResult.accessToken);
-    //       localStorage.setItem("id_token", authResult.idToken);
-    //       localStorage.setItem("profile", JSON.stringify(profile));
-    //     });
-    //   });
-    // });
     handleAuthentication();
   }, []);
 
   const fetchPrivate = () => {
-    const token = localStorage.getItem("id_token");
+    const token = localStorage.getItem(ID_TOKEN);
     console.log("token present?", token);
     fetch(PRIVATE_ENDPOINT, {
       method: "POST",
@@ -115,6 +112,7 @@ function App() {
       <button onClick={() => webAuth.authorize()}>Login</button>
       <button onClick={() => fetchPrivate()}>Fetch</button>
       <button onClick={() => logout()}>Logout</button>
+      <button onClick={() => checkAuth()}>Check</button>
       {/* <button onClick={() => checkAuth()}>Check Auth</button> */}
     </div>
   );
