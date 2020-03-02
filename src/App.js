@@ -18,7 +18,8 @@ const webAuth = new auth0.WebAuth({
   responseType: "token id_token",
   audience: "https://tonyjmartinez.auth0.com/userinfo",
   scope: "openid email",
-  redirectUri: isDev ? "http://localhost:3000" : "https://www.feedsubscri.be/"
+  // redirectUri: isDev ? "http://localhost:3000" : "https://www.feedsubscri.be/"
+  redirectUri: window.location.origin
 });
 const PRIVATE_ENDPOINT =
   "https://h9gqunf6y7.execute-api.us-west-2.amazonaws.com/dev/api/private";
