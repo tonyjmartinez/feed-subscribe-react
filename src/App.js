@@ -4,6 +4,7 @@ import "./App.css";
 import auth0 from "auth0-js";
 const { setSession } = auth0;
 const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+console.log("is dev?", isDev);
 
 console.log(localStorage.getItem("id_token"));
 // const domain = process.env.REACT_APP_AUTH0_DOMAIN;
@@ -17,8 +18,7 @@ const webAuth = new auth0.WebAuth({
   responseType: "token id_token",
   audience: "https://tonyjmartinez.auth0.com/userinfo",
   scope: "openid email",
-  redirectUri: window.location.origin
-  // redirectUri: "http://localhost:3000/"
+  redirectUri: isDev ? "http://localhost:3000" : "https://feedsubscri.be/"
 });
 const PRIVATE_ENDPOINT =
   "https://h9gqunf6y7.execute-api.us-west-2.amazonaws.com/dev/api/private";
