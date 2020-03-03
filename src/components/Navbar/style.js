@@ -1,5 +1,6 @@
 import React from "react";
 import { Menubar } from "primereact/menubar";
+import styled from "styled-components";
 const items = [
   {
     label: "File",
@@ -123,8 +124,20 @@ const items = [
     icon: "pi pi-fw pi-power-off"
   }
 ];
-const Navbar = props => {
-  return <Menubar style={{ color: "orange" }} model={items} />;
+
+const Navbar = ({ className }) => {
+  return <Menubar className={className} model={items} />;
 };
 
-export default Navbar;
+const StyledNav = styled(Navbar)`
+  &&& {
+    background-color: blue;
+    color: orange;
+
+    .p-menuitem-link {
+      color: pink;
+    }
+  }
+`;
+
+export default StyledNav;

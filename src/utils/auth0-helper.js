@@ -27,8 +27,8 @@ export const logout = () => {
   localStorage.removeItem("id_token");
   localStorage.removeItem("access_token");
   webAuth.logout({
-    returnTo: window.location.origin,
-    clientID
+    returnTo: window.location.origin
+    // clientID
   });
 };
 
@@ -55,13 +55,13 @@ export const checkAuth = cb => {
     if (err) {
       console.log("errror", err);
       cb(null);
-      return;
-    }
-    console.log("authResult", authResult);
+    } else {
+      console.log("authResult", authResult);
 
-    localStorage.setItem(ACCESS_TOKEN, authResult.accessToken);
-    localStorage.setItem(ID_TOKEN, authResult.idToken);
-    localStorage.setItem(EXPIRES_IN, authResult.expiresIn);
-    cb(authResult);
+      localStorage.setItem(ACCESS_TOKEN, authResult.accessToken);
+      localStorage.setItem(ID_TOKEN, authResult.idToken);
+      localStorage.setItem(EXPIRES_IN, authResult.expiresIn);
+      cb(authResult);
+    }
   });
 };
