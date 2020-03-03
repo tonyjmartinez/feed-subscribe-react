@@ -40,8 +40,10 @@ export function handleAuthentication(cb) {
       localStorage.setItem(ACCESS_TOKEN, authResult.accessToken);
       localStorage.setItem(ID_TOKEN, authResult.idToken);
       localStorage.setItem(EXPIRES_IN, authResult.expiresIn);
+      cb(true);
     } else if (err) {
       console.log(err);
+      cb(false);
     }
   });
 }

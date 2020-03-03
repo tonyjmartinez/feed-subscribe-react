@@ -51,15 +51,17 @@ const App = props => {
     // webAuth.authorize();
     console.log("expires in ? ", localStorage.getItem(EXPIRES_IN));
 
-    handleAuthentication();
+    handleAuthentication(res => {
+      setIsAuth(res);
+    });
   }, []);
   useEffect(() => {
     setTimeout(() => {
+      history.push("/");
       if (isAuth === null) {
         checkAuth(status => {
           console.log("status", status);
 
-          // history.push("/");
           if (!status) {
             setIsAuth(false);
           } else {
