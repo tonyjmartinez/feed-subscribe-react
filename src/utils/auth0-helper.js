@@ -9,6 +9,7 @@ export const ACCESS_TOKEN = "access_token";
 export const EXPIRES_IN = "expires_in";
 const clientID = process.env.REACT_APP_CLIENT_ID;
 
+console.log("auth0");
 const webAuth = new auth0.WebAuth({
   domain: "tonyjmartinez.auth0.com",
   clientID,
@@ -39,10 +40,8 @@ export function handleAuthentication(cb) {
       localStorage.setItem(ACCESS_TOKEN, authResult.accessToken);
       localStorage.setItem(ID_TOKEN, authResult.idToken);
       localStorage.setItem(EXPIRES_IN, authResult.expiresIn);
-      // TODO: Redirect to webroot
     } else if (err) {
       console.log(err);
-      alert("Error: " + err.error + ". Check the console for further details.");
     }
   });
 }

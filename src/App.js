@@ -45,25 +45,30 @@ const PRIVATE_ENDPOINT =
 // };
 
 const App = props => {
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(null);
+  const [message, setMessage] = useState("");
   useEffect(() => {
     // webAuth.authorize();
     console.log("expires in ? ", localStorage.getItem(EXPIRES_IN));
 
     handleAuthentication();
   }, []);
-
   useEffect(() => {
-    checkAuth(status => {
-      console.log("status", status);
-      if (!status) setIsAuth(false);
-      else {
-        setIsAuth(true);
-      }
+    setTimeout(() => {
+      if (isAuth === null) {
+        checkAuth(status => {
+          console.log("status", status);
 
-      history.push("/");
-    });
-  });
+          // history.push("/");
+          if (!status) {
+            setIsAuth(false);
+          } else {
+            setIsAuth(true);
+          }
+        });
+      }
+    }, 2000);
+  }, []);
 
   const fetchPrivate = () => {
     const token = localStorage.getItem(ID_TOKEN);
@@ -77,9 +82,11 @@ const App = props => {
       .then(response => response.json())
       .then(data => {
         console.log("Token:", data);
+        setMessage(data.message);
       })
       .catch(e => {
         console.log("error", e);
+        setMessage("error fetching");
       });
   };
   const history = createBrowserHistory();
@@ -95,6 +102,7 @@ const App = props => {
           Check
         </button>
         <div>{!isAuth ? "Not authenticated" : "Authenticated"}</div>
+        <div>Message: {message}</div>
       </Route>
     </Router>
   );
